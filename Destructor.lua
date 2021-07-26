@@ -20,12 +20,12 @@ function Destructor.new()
 	return setmetatable({}, Destructor)
 end
 
-function Destructor:add(item)
+function Destructor:Add(item)
 	self[item] = finalizers[typeof(item)]
 	return item
 end
 
-function Destructor:destroy()
+function Destructor:Destroy()
 	for item, finalizer in pairs(self) do
 		finalizer(item)
 	end
