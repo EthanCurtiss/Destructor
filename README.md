@@ -8,18 +8,19 @@ Bulk object destructor for simplifying cleanup tasks. Supports functions, instan
 
 Creates a new object.
 
-#### `Destructor:add(item)`
+#### `Destructor:Add(item)`
 
-Adds an item to be finalized on the next call to `destroy`.
+Adds an item to be finalized on the next call to `Destroy`.
 Throws an error if the object's type is unsupported.
 
-#### `Destructor:destroy()`
+#### `Destructor:Destroy()`
 
 Finalizes items that have been added and removes all items from the Destructor.
 The finalizers are defined for various types as follows:
 - `Function`: Calls the function.
 - `Instance`: Calls :Destroy() on the object.
 - `RBXScriptConnection`: Calls :Disconnect() on the object.
+- `table`: Calls :Destroy() on the table, assuming that it is an object.
 
 ## Example
 
@@ -29,23 +30,39 @@ local dtor = Destructor.new()
 
 
 -- Functions:
-dtor:add(function()
+dtor:Add(function()
     print("Foo")
 end)
-dtor:destroy() -- > Foo
+dtor:Destroy() -- > Foo
 
 
 -- Instances:
 local newPart = Instance.new("Part", workspace)
-dtor:add(newPart)
+dtor:Add(newPart)
 wait(1)
-dtor:destroy() -- newPart is :Destroy()ed
+dtor:Destroy() -- newPart is :Destroy()ed
 
 
 -- Connections:
-dtor:add(RunService.Stepped:Connect(function()
+dtor:Add(RunService.Stepped:Connect(function()
     print("Bar") -- Starts printing "Bar" every frame
 end))
 wait(1)
-dtor:destroy() -- Stops printing "Bar" every frame
+dtor:Destroy() -- Stops printing "Bar" every frame
+
+-- Objects:
+local class = {}
+class.__index = class
+
+function class.new()
+    return setmetatable({), class)
+end
+
+function class:Destroy()
+    -- clean up (typically with another Destructor)
+end
+
+local object = class.new()
+dtor:Add(object)
+dtor:Destroy() -- object is :Destroy()ed
 ```
