@@ -7,6 +7,9 @@ local finalizers = setmetatable({
 	end,
 	["Instance"] = game.Destroy,
 	["RBXScriptConnection"] = Instance.new("BindableEvent").Event:Connect(function() end).Disconnect,
+	["table"] = function(item)
+		item:Destroy()
+	end,
 }, {
 	__index = function(self, className)
 		error(("Cannot destruct item of type '%s' (no finalizer is defined)"):format(className), 3)
