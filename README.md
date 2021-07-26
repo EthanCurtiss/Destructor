@@ -59,7 +59,7 @@ function class.new()
 end
 
 function class:Destroy()
-    -- clean up (typically with another Destructor)
+    -- Clean up (typically with another Destructor)
 end
 
 local object = class.new()
